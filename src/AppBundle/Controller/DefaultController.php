@@ -45,7 +45,7 @@ class DefaultController extends Controller
             $em->persist($product);
             $em->flush();
 
-            return $this->redirectToRoute('task_success');
+            return $this->redirectToRoute('insert_product');
         }
 
         return $this->render('product/insert.html.twig', array(
@@ -73,11 +73,15 @@ class DefaultController extends Controller
             $em->persist($category);
             $em->flush();
 
-            return $this->redirectToRoute('task_success');
+            return $this->redirectToRoute('insert_category');
         }
 
+        $repository = $this->getDoctrine()
+            ->getRepository('AppBundle:Category');
+        $categories = $repository->findByParent(NULL);
+
         return $this->render('category/insert.html.twig', array(
-            'form' => $form->createView(),
+            'form' => $form->createView(), 'categories' => $categories
         ));
     }
 
