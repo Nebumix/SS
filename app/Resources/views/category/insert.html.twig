@@ -1,3 +1,19 @@
 {{ form(form) }}
 
 
+<hr>
+<br>
+
+
+<ul>
+{% for category in categories %}
+    <li>{{ category }}</li>
+
+    <ul>
+    {% for child in category.children %}
+        <li>{{ child }}</li>
+    {% endfor %}
+    </ul>
+
+{% endfor %}
+</ul>
