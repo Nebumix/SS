@@ -25,11 +25,6 @@ class CategoryType extends AbstractType
                 'placeholder' => 'Nessuna categoria genitore',
                 'required' => false,
             ))
-/*            ->add('parent', EntityType::class, array(
-                'class'       => 'AppBundle:Category',
-                'placeholder' => 'Nessuna categoria genitore',
-
-            ))*/
             ->add('save', SubmitType::class)
         ;
     }
