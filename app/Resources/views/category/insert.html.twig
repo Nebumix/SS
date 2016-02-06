@@ -4,7 +4,9 @@
 <link rel="stylesheet" href="{{ asset('css/jquery-ui.structure.min.css') }}" />
 <link rel="stylesheet" href="{{ asset('css/jquery-ui.theme.min.css') }}" />
 
+<script src="{{ asset('bundles/fosjsrouting/js/router.js') }}"></script>
 
+<script src="/js/fos_js_routes.js"></script>
 
 {{ form(form) }}
 
@@ -56,6 +58,7 @@
     }
 
     function edit_category(id){
+        alert(Routing.generate('insert_product'));
         $( "#dialog-form" ).load( "ajax/test.html" );
 
         $( "#dialog-form" ).dialog( "open" );
