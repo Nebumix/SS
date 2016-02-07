@@ -32,7 +32,7 @@ class Category
 
     /**
      *
-     * @ORM\ManyToOne(targetEntity="Category", inversedBy="children")
+     * @ORM\ManyToOne(targetEntity="Category", inversedBy="children", cascade={"all"})
      * @ORM\JoinColumn(name="parent_id", referencedColumnName="id")
      *
      */
@@ -60,7 +60,7 @@ class Category
     private $adminId;
 
     /**
-     * @ORM\OneToMany(targetEntity="Category", mappedBy="parent")
+     * @ORM\OneToMany(targetEntity="Category", mappedBy="parent", cascade={"persist", "remove", "merge"})
      */
     protected $children;
 

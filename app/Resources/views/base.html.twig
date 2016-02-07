@@ -5,8 +5,28 @@
         <title>{% block title %}Welcome!{% endblock %}</title>
         {% block stylesheets %}{% endblock %}
         <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
+
+        <script src="{{ asset('js/jquery-1.11.3.min.js') }}"></script>
+        <script src="{{ asset('js/jquery-ui.min.js') }}"></script>
+        <link rel="stylesheet" href="{{ asset('css/jquery-ui.min.css') }}" />
+        <link rel="stylesheet" href="{{ asset('css/jquery-ui.structure.min.css') }}" />
+        <link rel="stylesheet" href="{{ asset('css/jquery-ui.theme.min.css') }}" />
+
+        <script src="{{ asset('bundles/fosjsrouting/js/router.js') }}"></script>
+
+        <script src="/js/fos_js_routes.js"></script>
+
     </head>
     <body>
+
+        <a href="{{ path('insert_category') }}">INSERISCI CATEGORIA</a> |
+        <a href="{{ path('insert_tag') }}">INSERISCI TAG</a> |
+        <a href="{{ path('insert_brand') }}">INSERISCI BRAND</a> |
+        <a href="{{ path('insert_product') }}">INSERISCI PRODOTTO</a>
+
+
+        <br><hr><br>
+
         {% block body %}{% endblock %}
         {% block javascripts %}{% endblock %}
     </body>
