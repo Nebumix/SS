@@ -1,84 +1,169 @@
-<script src="{{ asset('js/jquery-1.11.3.min.js') }}"></script>
-<script src="{{ asset('js/jquery-ui.min.js') }}"></script>
-<link rel="stylesheet" href="{{ asset('css/jquery-ui.min.css') }}" />
-<link rel="stylesheet" href="{{ asset('css/jquery-ui.structure.min.css') }}" />
-<link rel="stylesheet" href="{{ asset('css/jquery-ui.theme.min.css') }}" />
+{% extends 'base.html.twig' %}
 
-<script src="{{ asset('bundles/fosjsrouting/js/router.js') }}"></script>
+{% block body %}
 
-<script src="/js/fos_js_routes.js"></script>
+    <style>
 
-{{ form(form) }}
+        .sortable {
+            border: 1px solid #eee;
+            min-height: 20px;
+            margin: 0;
+            padding: 5px 0 0 0;
+            margin-right: 10px;
+        }
+        .sortable li {
+            margin: 0 5px 5px 5px;
+            padding: 5px;
+            font-size: 1.2em;
+            min-height: 20px;
+        }
 
 
-<hr>
-<br>
+    </style>
 
+    {{ form(form) }}
 
-<ul>
-{% for category in categories %}
-    <li>{{ category }} <button onclick="javascript:edit_category( '{{ category.id }}' );">Edit</button></li>
+    <hr>
+    <br>
 
     <ul>
-    {% for child in category.children %}
-        <li>{{ child }} <button onclick="javascript:edit_category( '{{ child.id }}' );">Edit</button></li>
+    {% for category in categories %}
+        <li>{{ category }}
+            <button onclick="javascript:edit_category( '{{ category.id }}' );">Edit</button>
+            <button onclick="javascript:delete_category( '{{ category.id }}' );">Delete</button>
+        </li>
+
+        <ul id="{{ category.id }}" class="sortable connectedSortable">
+        {% for child in category.children %}
+            <li id="{{ child.id }}">{{ child }}
+                <button onclick="javascript:edit_category( '{{ child.id }}' );">Edit</button>
+                <button onclick="javascript:delete_category( '{{ child.id }}' );">Delete</button>
+            </li>
+        {% endfor %}
+        </ul>
+
     {% endfor %}
     </ul>
 
-{% endfor %}
-</ul>
+    <div id="dialog-form" title="Edit category"></div>
 
-<script>
 
-    $(function() {
-        var dialog;
+{% endblock %}
 
-        dialog = $( "#dialog-form" ).dialog({
-            autoOpen: false,
-            height: 300,
-            width: 350,
-            modal: true,
-            buttons: {
-                "Save": addUser,
-                Cancel: function() {
-                    dialog.dialog( "close" );
+{% block javascripts %}
+
+
+    <script>
+
+        $(function() {
+            var dialog;
+
+            dialog = $( "#dialog-form" ).dialog({
+                autoOpen: false,
+                height: 300,
+                width: 350,
+                modal: true,
+                buttons: {
+                    "Save": saveCategory,
+                    Cancel: function() {
+                        dialog.dialog( "close" );
+                    }
+                },
+                close: function() {
+                    /*                form[ 0 ].reset();
+                     allFields.removeClass( "ui-state-error" );*/
                 }
-            },
-            close: function() {
-/*                form[ 0 ].reset();
-                allFields.removeClass( "ui-state-error" );*/
-            }
+            });
+
+
+
+            $( ".sortable" ).sortable({
+                connectWith: ".connectedSortable"
+            }).disableSelection();
+
+            $( ".sortable" ).sortable({
+                stop: function( event, ui ) {
+                    //alert (ui.item.closest('ul').attr('id'));
+                    updateParent(ui.item.attr('id'), ui.item.closest('ul').attr('id'));
+                }
+            });
+
+
+
+
         });
 
+        function saveCategory(){
+            $.ajax({
+                url: Routing.generate('edit_category_save'),
+                type: "POST",
+                async: true,
+                data: { id : $('#form_id').val(), name : $('#form_name').val() },
+                dataType: "html",
+                success: function(msg) {
 
-    });
+                    if(msg == 1){
+                        location.reload();
+                    }
 
-    function addUser(){
+                },
+                error: function(){
+                    alert("ERROR!");
+                }
+            });
+        }
 
-    }
+        function updateParent(id, parent){
+            $.ajax({
+                url: Routing.generate('update_category_parent' , { id : id, parent_id : parent }),
+                type: "GET",
+                async: true,
+                dataType: "html",
+                success: function(msg) {
 
-    function edit_category(id){
-        alert(Routing.generate('insert_product'));
-        $( "#dialog-form" ).load( "ajax/test.html" );
+                    if(msg == 1){
+                        alert('saved');
+                    }
 
-        $( "#dialog-form" ).dialog( "open" );
-    }
+                },
+                error: function(){
+                    alert("ERROR!");
+                }
+            });
+        }
 
-</script>
+        function edit_category(id){
+            $( "#dialog-form" ).load( Routing.generate('edit_category', { id: id }), function() {
+                $( "#dialog-form" ).dialog( "open" );
+            });
+        }
 
+        function delete_category(id){
 
-<div id="dialog-form" title="Edit category">
+            var confirmQ = confirm("Sei sicuro di voler cancellare la categoria? Se si tratta di una categoria genitore, tutte le sottocategorie verranno cancellate automaticamente.");
+            if (confirmQ === true) {
 
-    <form>
-        <fieldset>
-            <label for="name">Name</label>
-            <input type="text" name="name" id="name" value="Jane Smith" class="text ui-widget-content ui-corner-all">
-            <label for="email">Email</label>
-            <input type="text" name="email" id="email" value="jane@smith.com" class="text ui-widget-content ui-corner-all">
-            <label for="password">Password</label>
-            <input type="password" name="password" id="password" value="xxxxxxx" class="text ui-widget-content ui-corner-all">
+                $.ajax({
+                    url: Routing.generate('delete_category', {id: id}),
+                    type: "GET",
+                    async: true,
+                    dataType: "html",
+                    success: function (msg) {
 
-        </fieldset>
-    </form>
-</div>
+                        if (msg == 1) {
+                            location.reload();
+                        }
 
+                    },
+                    error: function () {
+                        alert("ERROR!");
+                    }
+                });
+
+            }
+
+        }
+
+    </script>
+
+{% endblock %}

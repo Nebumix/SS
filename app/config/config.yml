@@ -76,4 +76,4 @@ fos_user:
     user_class: AppBundle\Entity\User
 
 fos_js_routing:
-    routes_to_expose: [ insert_product ]
+    routes_to_expose: [ edit_category, delete_category, edit_category_save, update_category_parent, edit_brand, delete_brand, edit_brand_save, insert_tag, edit_tag, edit_tag_save, delete_tag ]

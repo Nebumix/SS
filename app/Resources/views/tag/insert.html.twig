@@ -1,0 +1,103 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+    {{ form(form) }}
+
+    <hr>
+    <br>
+
+    <ul>
+    {% for tag in tags %}
+        <li>{{ tag.name }}
+            <button onclick="javascript:edit_tag( '{{ tag.id }}' );">Edit</button>
+            <button onclick="javascript:delete_tag( '{{ tag.id }}' );">Delete</button>
+        </li>
+    {% endfor %}
+    </ul>
+
+    <div id="dialog-form" title="Edit tag"></div>
+
+{% endblock %}
+
+{% block javascripts %}
+
+    <script>
+
+        $(function() {
+            var dialog;
+
+            dialog = $( "#dialog-form" ).dialog({
+                autoOpen: false,
+                height: 300,
+                width: 350,
+                modal: true,
+                buttons: {
+                    "Save": saveTag,
+                    Cancel: function() {
+                        dialog.dialog( "close" );
+                    }
+                },
+                close: function() {
+                    /*                form[ 0 ].reset();
+                     allFields.removeClass( "ui-state-error" );*/
+                }
+            });
+
+        });
+
+        function saveTag(){
+            $.ajax({
+                url: Routing.generate('edit_tag_save'),
+                type: "POST",
+                async: true,
+                data: { id : $('#form_id').val(), name : $('#form_name').val() },
+                dataType: "html",
+                success: function(msg) {
+
+                    if(msg == 1){
+                        location.reload();
+                    }
+
+                },
+                error: function(){
+                    alert("ERROR!");
+                }
+            });
+        }
+
+        function edit_tag(id){
+            $( "#dialog-form" ).load( Routing.generate('edit_tag', { id: id }), function() {
+                $( "#dialog-form" ).dialog( "open" );
+            });
+        }
+
+        function delete_tag(id){
+
+            var confirmQ = confirm("Sei sicuro di voler cancellare il tag?");
+            if (confirmQ === true) {
+
+                $.ajax({
+                    url: Routing.generate('delete_tag', {id: id}),
+                    type: "GET",
+                    async: true,
+                    dataType: "html",
+                    success: function (msg) {
+
+                        if (msg == 1) {
+                            location.reload();
+                        }
+
+                    },
+                    error: function () {
+                        alert("ERROR!");
+                    }
+                });
+
+            }
+
+        }
+
+    </script>
+
+{% endblock %}
