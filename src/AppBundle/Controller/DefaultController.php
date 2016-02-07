@@ -12,6 +12,11 @@ use AppBundle\Entity\Product;
 use AppBundle\Form\Type\CategoryType;
 use AppBundle\Entity\Category;
 
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+
+use Symfony\Component\HttpFoundation\Response;
+
 class DefaultController extends Controller
 {
     /**
@@ -50,38 +55,6 @@ class DefaultController extends Controller
 
         return $this->render('product/insert.html.twig', array(
             'form' => $form->createView(),
-        ));
-    }
-
-    /**
-     * @Route("/insert/category", name="insert_category")
-     */
-    public function insertCategoryAction(Request $request)
-    {
-        $category = new Category();
-        $category->setAdded(new \DateTime('now'));
-        $category->setAdminId($this->getUser()->getId());
-
-        $form = $this->createForm(CategoryType::class, $category);
-
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-
-            $em = $this->getDoctrine()->getManager();
-
-            $em->persist($category);
-            $em->flush();
-
-            return $this->redirectToRoute('insert_category');
-        }
-
-        $repository = $this->getDoctrine()
-            ->getRepository('AppBundle:Category');
-        $categories = $repository->findByParent(NULL);
-
-        return $this->render('category/insert.html.twig', array(
-            'form' => $form->createView(), 'categories' => $categories
         ));
     }
 
